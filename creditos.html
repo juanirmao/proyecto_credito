@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presta-Fácil | Sistema de Gestión de Préstamos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-dark: #0a1128;
+      --bg-nav: #001f3f;
+      --header-blue: #002b5b;
+      --card-header: #1a365d;
+      --border-blue: #2b4c7e;
+      --accent-green: #2ecc71;
+      --accent-orange: #f39c12;
+      --light-bg: #f4f7f6;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: #dce4ec;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar Izquierda */
+    .sidebar {
+      width: 60px;
+      background-color: var(--header-blue);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 15px;
+      gap: 20px;
+      color: #94a3b8;
+    }
+
+    .sidebar i {
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .sidebar i:hover, .sidebar i.active {
+      color: #ffffff;
+    }
+
+    /* Contenedor Principal */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Topbar Header Azul */
+    .topbar {
+      background-color: var(--header-blue);
+      color: white;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 2px solid #001f3f;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .brand i {
+      color: #38bdf8;
+    }
+
+    .topbar-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* Área de Contenido */
+    .content {
+      flex: 1;
+      background-color: #ffffff;
+      padding: 15px 25px;
+      overflow-y: auto;
+    }
+
+    /* Pestañas */
+    .tabs-container {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .tab {
+      padding: 6px 16px;
+      background-color: #e2e8f0;
+      color: #475569;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 4px 4px 0 0;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .tab.active {
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-bottom: none;
+      color: #0f172a;
+    }
+
+    /* Cajas de Sección General */
+    .section-card {
+      border: 2px solid var(--header-blue);
+      border-radius: 6px;
+      margin-bottom: 15px;
+      overflow: hidden;
+      background-color: #ffffff;
+    }
+
+    .section-header {
+      background-color: var(--header-blue);
+      color: white;
+      text-align: center;
+      padding: 6px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 15px;
+    }
+
+    .desglose-body {
+      padding: 15px 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      align-items: center;
+      background-color: #f8fafc;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-group label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #334155;
+      text-transform: uppercase;
+    }
+
+    .field-group input, .field-group select {
+      padding: 6px 10px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #0f172a;
+      outline: none;
+    }
+
+    .field-group input:focus, .field-group select:focus {
+      border-color: var(--header-blue);
+    }
+
+    .badge-activo {
+      color: var(--accent-green);
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    /* Grid de Tarjetas de Resumen Mensual */
+    .resumen-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      padding: 12px;
+      background-color: #f8fafc;
+    }
+
+    .card-stat {
+      border-radius: 8px;
+      padding: 12px 15px;
+      text-align: center;
+      border: 1.5px solid;
+    }
+
+    .card-stat.cuota {
+      background-color: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+
+    .card-stat.abono {
+      background-color: #f0f9ff;
+      border-color: #bae6fd;
+    }
+
+    .card-stat.interes {
+      background-color: #fffbebfb;
+      border-color: #fef08a;
+    }
+
+    .card-stat .title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-stat.cuota .title { color: #166534; }
+    .card-stat.abono .title { color: #075985; }
+    .card-stat.interes .title { color: #854d0e; }
+
+    .card-stat .value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    /* Botones de acción */
+    .btn-action {
+      background-color: #38bdf8;
+      color: #0f172a;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-action:hover {
+      background-color: #0284c7;
+      color: #ffffff;
+    }
+
+    /* Tabla de Amortización */
+    .table-container {
+      overflow-x: auto;
+      max-height: 350px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background-color: var(--header-blue);
+      color: white;
+      padding: 8px 10px;
+      text-align: center;
+      font-weight: 600;
+      border: 1px solid #1e3a8a;
+      z-index: 10;
+    }
+
+    tbody td {
+      padding: 6px 10px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      font-weight: 500;
+      color: #1e293b;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .status-pagado {
+      color: var(--accent-green);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .status-pendiente {
+      color: var(--accent-orange);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    @media print {
+      .sidebar, .topbar, .tabs-container, .btn-action {
+        display: none !important;
+      }
+      body {
+        background-color: #ffffff;
+      }
+      .content {
+        padding: 0;
+      }
+      .table-container {
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Lateral Izquierdo -->
+  <div class="sidebar">
+    <i class="fa-solid fa-bars" title="Menú"></i>
+    <i class="fa-solid fa-house active" title="Inicio"></i>
+    <i class="fa-solid fa-clock-rotate-left" title="Historial"></i>
+    <i class="fa-solid fa-calculator" title="Calculadora"></i>
+    <i class="fa-solid fa-building-columns" title="Contabilidad"></i>
+    <i class="fa-solid fa-folder" title="Documentos"></i>
+    <i class="fa-solid fa-gear" title="Configuración"></i>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="main-wrapper">
+    
+    <!-- Header Topbar -->
+    <div class="topbar">
+      <div class="brand">
+        <i class="fa-solid fa-hand-holding-dollar"></i>
+        <span>PRESTA-FÁCIL</span>
+      </div>
+      <div class="topbar-title">
+        SISTEMA DE GESTIÓN DE PRÉSTAMOS
+      </div>
+      <div>
+        <i class="fa-solid fa-right-from-bracket" title="Cerrar Sesión" style="cursor: pointer;"></i>
+      </div>
+    </div>
+
+    <!-- Área de Trabajo -->
+    <div class="content">
+      
+      <!-- Pestañas -->
+      <div class="tabs-container">
+        <div class="tab" onclick="switchTab(this)">Comprar</div>
+        <div class="tab active" onclick="switchTab(this)">Procesional</div>
+      </div>
+
+      <!-- Sección: Desglose del Crédito (Formulario Editable) -->
+      <div class="section-card">
+        <div class="section-header">
+          <span>DESGLOSE DEL CRÉDITO</span>
+          <button class="btn-action" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir</button>
+        </div>
+        <div class="desglose-body">
+          <div class="field-group">
+            <label>Monto Solicitado (DOP)</label>
+            <input type="number" id="montoInput" value="200000" step="5000" oninput="recalcular()">
+          </div>
+
+          <div class="field-group">
+            <label>Tasa Mensual (%)</label>
+            <input type="number" id="tasaInput" value="3.5" step="0.1" oninput="recalcular()">
+          </div>
+
+          <div class="field-group">
+            <label>Plazo (Meses)</label>
+            <select id="plazoSelect" onchange="recalcular()">
+              <option value="12" selected>12 Meses (1 Año)</option>
+              <option value="24">24 Meses (2 Años)</option>
+              <option value="36">36 Meses (3 Años)</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Cliente</label>
+            <input type="text" id="clienteInput" value="Jorge Rodríguez">
+          </div>
+
+          <div class="field-group">
+            <label>Estado del Crédito</label>
+            <span class="badge-activo">ACTIVO</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección: Resumen del Pago Mensual -->
+      <div class="section-card">
+        <div class="section-header">RESUMEN DEL PAGO MENSUAL</div>
+        <div class="resumen-cards">
+          <div class="card-stat cuota">
+            <div class="title">Cuota Total Mensual</div>
+            <div class="value" id="resumenCuota">RD$ 0.00</div>
+          </div>
+          <div class="card-stat abono">
+            <div class="title">Abono a Capital</div>
+            <div class="value" id="resumenAbono">RD$ 0.00</div>
+          </div>
+          <div class="card-stat interes">
+            <div class="title">Interés Mensual</div>
+            <div class="value" id="resumenInteres">RD$ 0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección: Tabla de Amortización Completa -->
+      <div class="section-card">
+        <div class="section-header">TABLA DE AMORTIZACIÓN COMPLETA</div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Cuota #</th>
+                <th>Fecha de Pago</th>
+                <th>Cuota Total</th>
+                <th>Abono a Capital</th>
+                <th>Interés Mensual</th>
+                <th>Saldo Insoluto</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-body">
+              <!-- Filas generadas por JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Estado inicial de pagos marcados
+    let pagosEstado = {};
+
+    function recalcular() {
+      const monto = parseFloat(document.getElementById('montoInput').value) || 0;
+      const tasa = (parseFloat(document.getElementById('tasaInput').value) || 0) / 100;
+      const plazo = parseInt(document.getElementById('plazoSelect').value) || 12;
+
+      // Cálculos bajo modelo de interés fijo sobre capital inicial
+      const abonoCapital = monto / plazo;
+      const interesMensual = monto * tasa;
+      const cuotaTotal = abonoCapital + interesMensual;
+
+      // Actualizar Resumen en pantalla
+      document.getElementById('resumenCuota').innerText = formatCurrency(cuotaTotal);
+      document.getElementById('resumenAbono').innerText = formatCurrency(abonoCapital);
+      document.getElementById('resumenInteres').innerText = formatCurrency(interesMensual);
+
+      // Generar Tabla de Amortización
+      const tablaBody = document.getElementById('tabla-body');
+      tablaBody.innerHTML = '';
+
+      let saldo = monto;
+      const hoy = new Date();
+
+      for (let i = 1; i <= plazo; i++) {
+        saldo -= abonoCapital;
+        const fechaPago = new Date(hoy.getFullYear(), hoy.getMonth() + i, 15);
+        const fechaStr = `${fechaPago.getDate()}/${fechaPago.getMonth() + 1}/${fechaPago.getFullYear()}`;
+
+        // Control del estado pagado/pendiente
+        if (!(i in pagosEstado)) {
+          pagosEstado[i] = (i === 1); // La primera cuota viene pagada por defecto en el ejemplo
+        }
+
+        const esPagado = pagosEstado[i];
+        const estadoHTML = esPagado 
+          ? `<span class="status-pagado" onclick="toggleEstado(${i})">PAGADO</span>` 
+          : `<span class="status-pendiente" onclick="toggleEstado(${i})">PENDIENTE</span>`;
+
+        const fila = `
+          <tr>
+            <td>Cuota ${i}</td>
+            <td>${fechaStr}</td>
+            <td>${formatCurrency(cuotaTotal)}</td>
+            <td>${formatCurrency(abonoCapital)}</td>
+            <td>${formatCurrency(interesMensual)}</td>
+            <td>${formatCurrency(Math.max(0, saldo))}</td>
+            <td>${estadoHTML}</td>
+          </tr>
+        `;
+        tablaBody.innerHTML += fila;
+      }
+    }
+
+    function toggleEstado(cuotaNum) {
+      pagosEstado[cuotaNum] = !pagosEstado[cuotaNum];
+      recalcular();
+    }
+
+    function switchTab(element) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    function formatCurrency(val) {
+      return 'RD$ ' + val.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Ejecutar al cargar la página
+    window.onload = recalcular;
+  </script>
+
+</body>
+</html>
